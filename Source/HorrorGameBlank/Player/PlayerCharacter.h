@@ -83,6 +83,6 @@ private:
 	bool bIsCrouching;
 
 	// Handles continuous crouch check
-	void CheckCrouch();
+	bool bIsCrouchKeyHeldDown;
 };
 
