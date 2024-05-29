@@ -10,22 +10,22 @@
 UCLASS()
 class HORRORGAMEBLANK_API APlayerCharacter : public ACharacter
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	// Sets default values for this character's properties
-	APlayerCharacter();
+    // Sets default values for this character's properties
+    APlayerCharacter();
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+    // Called when the game starts or when spawned
+    virtual void BeginPlay() override;
 
 public:
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+    // Called every frame
+    virtual void Tick(float DeltaTime) override;
 
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+    // Called to bind functionality to input
+    virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 protected:
 	// Player's camera component
@@ -53,33 +53,36 @@ protected:
 	float CrouchCameraZ = 20.0f;
 
 	// Handles moving forward/backward
-	void MoveForward(float InputValue);
+    void MoveForward(float InputValue);
 
 	// Handles moving right/left
-	void MoveRight(float InputValue);
+    void MoveRight(float InputValue);
 
 	// Handles turning the camera left/right
-	void TurnCamera(float InputValue);
+    void TurnCamera(float InputValue);
 
 	// Handles looking up/down
-	void LookUp(float InputValue);
+    void LookUp(float InputValue);
 
 	// Handles crouching
-	void StartCrouch();
-	void StopCrouch();
+    void StartCrouch();
+    void StopCrouch();
 
 	// Handles running
-	void StartRun();
-	void StopRun();
-
-private:
-	// Stores the default capsule half-height
-	float DefaultCapsuleHalfHeight;
+    void StartRun();
+    void StopRun();
 
 	// Checks if there's enough space to stand up
 	bool CanStandUp() const;
-	
+
+private:
+	// Stores the default capsule half-height
+    float DefaultCapsuleHalfHeight;
+
 	// Check if player is crouch
 	bool bIsCrouching;
+
+	// Handles continuous crouch check
+	void CheckCrouch();
 };
 

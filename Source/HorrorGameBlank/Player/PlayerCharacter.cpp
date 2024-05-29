@@ -2,7 +2,6 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Engine/World.h"
-#include "DrawDebugHelpers.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -85,8 +84,8 @@ void APlayerCharacter::TurnCamera(float InputValue)
 {
     if (InputValue != 0.0f)
     {
-        AddControllerYawInput(InputValue);
-    }
+    AddControllerYawInput(InputValue);
+}
 }
 
 // Handles looking up/down
@@ -94,8 +93,8 @@ void APlayerCharacter::LookUp(float InputValue)
 {
     if (InputValue != 0.0f)
     {
-        AddControllerPitchInput(InputValue);
-    }
+    AddControllerPitchInput(InputValue);
+}
 }
 
 // Handles starting crouch
@@ -164,43 +163,47 @@ void APlayerCharacter::StopRun()
     GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 }
 
+// Checks if the character can stand up
 bool APlayerCharacter::CanStandUp() const
 {
-    // Get the character's current location and capsule component
-    FVector StartLocation = GetCapsuleComponent()->GetComponentLocation();
+    FVector CapsuleBaseLocation = GetCapsuleComponent()->GetComponentLocation();
+    float CapsuleRadius = GetCapsuleComponent()->GetUnscaledCapsuleRadius();
+    float CapsuleHeight = GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight();
+
+    // Move the start location up by the crouch height to avoid detecting the floor
+    FVector StartLocation = CapsuleBaseLocation + FVector(0.0f, 0.0f, CapsuleRadius + CrouchHeight);
     float StandUpHeightDifference = DefaultCapsuleHalfHeight - CrouchHeight;
     FVector EndLocation = StartLocation + FVector(0.0f, 0.0f, StandUpHeightDifference);
 
-    FCollisionShape StandingCapsule = FCollisionShape::MakeCapsule(GetCapsuleComponent()->GetUnscaledCapsuleRadius(), DefaultCapsuleHalfHeight);
+    FCollisionShape StandingCapsule = FCollisionShape::MakeCapsule(CapsuleRadius, DefaultCapsuleHalfHeight);
 
     FHitResult HitResult;
     bool bHit = GetWorld()->SweepSingleByChannel(
         HitResult,
         StartLocation,
-        StartLocation + FVector(0.0f, 0.0f, StandUpHeightDifference),
+        EndLocation,
         FQuat::Identity,
-        ECollisionChannel::ECC_Visibility,
+        ECC_Visibility,
         StandingCapsule
     );
 
-    // Draw the debug capsule
-    DrawDebugCapsule(
-        GetWorld(),
-        StartLocation + FVector(0.0f, 0.0f, StandUpHeightDifference / 2),
-        DefaultCapsuleHalfHeight,
-        GetCapsuleComponent()->GetUnscaledCapsuleRadius(),
-        FQuat::Identity,
-        bHit ? FColor::Red : FColor::Green,
-        false,
-        2.0f,
-        0,
-        1.0f
-    );
+    // Debugging logs for the sweep parameters and result
+    UE_LOG(LogTemp, Warning, TEXT("CanStandUp Sweep Parameters:"));
+    UE_LOG(LogTemp, Warning, TEXT("StartLocation: %s"), *StartLocation.ToString());
+    UE_LOG(LogTemp, Warning, TEXT("EndLocation: %s"), *EndLocation.ToString());
+    UE_LOG(LogTemp, Warning, TEXT("Capsule Radius: %f"), StandingCapsule.GetCapsuleRadius());
+    UE_LOG(LogTemp, Warning, TEXT("Capsule Half Height: %f"), StandingCapsule.GetCapsuleHalfHeight());
+    UE_LOG(LogTemp, Warning, TEXT("CanStandUp Sweep Result: %s"), bHit ? TEXT("Hit") : TEXT("No Hit"));
 
-    // Log the result
-    UE_LOG(LogTemp, Warning, TEXT("CanStandUp: %s"), bHit ? TEXT("False") : TEXT("True"));
+    if (bHit)
+    {
+        DrawDebugCapsule(GetWorld(), HitResult.Location, DefaultCapsuleHalfHeight, CapsuleRadius, FQuat::Identity, FColor::Red, false, 2.0f);
+        UE_LOG(LogTemp, Warning, TEXT("Hit Object: %s"), *HitResult.GetActor()->GetName());
+    }
 
     return !bHit;
 }
+
+
 
 
