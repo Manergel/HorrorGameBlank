@@ -20,12 +20,17 @@ APlayerCharacter::APlayerCharacter()
     // Initialize default values
     DefaultCapsuleHalfHeight = GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight();
     DefaultCameraZ = Camera->GetRelativeLocation().Z;
+
+    // Enable crouching
+    GetCharacterMovement()->GetNavAgentPropertiesRef().bCanCrouch = true;
+
 }
 
 // Called when the game starts or when spawned
 void APlayerCharacter::BeginPlay()
 {
     Super::BeginPlay();
+
 }
 
 // Called every frame
@@ -105,13 +110,18 @@ void APlayerCharacter::LookUp(float InputValue)
 // Handles starting crouch
 void APlayerCharacter::StartCrouch()
 {
+    if (bIsCrouching)
+    {
+        return; // Prevent starting crouch if already crouching
+    }
+
     Crouch();
     bIsCrouching = true;
     bIsCrouchKeyHeldDown = true;
     GetCharacterMovement()->MaxWalkSpeed = CrouchSpeed;
 
     // Adjust capsule half-height
-    GetCapsuleComponent()->SetCapsuleHalfHeight(CrouchHeight);
+    GetCapsuleComponent()->SetCapsuleHalfHeight(CrouchHeight, true); // Ensure smooth transition
 
     // Adjust camera height
     FVector CameraLocation = Camera->GetRelativeLocation();
@@ -132,7 +142,7 @@ void APlayerCharacter::StopCrouch()
         GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 
         // Reset capsule half-height
-        GetCapsuleComponent()->SetCapsuleHalfHeight(DefaultCapsuleHalfHeight);
+        GetCapsuleComponent()->SetCapsuleHalfHeight(DefaultCapsuleHalfHeight, true); // Ensure smooth transition)
 
         // Reset camera height
         FVector CameraLocation = Camera->GetRelativeLocation();
@@ -183,7 +193,3 @@ bool APlayerCharacter::CanStandUp() const
 
     return !bHit;
 }
-
-
-
-

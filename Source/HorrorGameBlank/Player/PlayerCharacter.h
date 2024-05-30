@@ -84,5 +84,6 @@ private:
 
 	// Handles continuous crouch check
 	bool bIsCrouchKeyHeldDown;
+
 };
 
