@@ -20,9 +20,8 @@ APlayerCharacter::APlayerCharacter()
     // Initialize default values
     DefaultCapsuleHalfHeight = GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight();
     DefaultCameraZ = Camera->GetRelativeLocation().Z;
-
-    // Enable crouching
-    GetCharacterMovement()->GetNavAgentPropertiesRef().bCanCrouch = true;
+    TargetCapsuleHalfHeight = DefaultCapsuleHalfHeight;
+    TargetCameraZ = DefaultCameraZ;
 
 }
 
@@ -42,6 +41,16 @@ void APlayerCharacter::Tick(float DeltaTime)
     {
         StopCrouch();
     }
+
+    // Interpolate capsule height
+    float CurrentCapsuleHalfHeight = GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight();
+    float NewCapsuleHalfHeight = FMath::FInterpTo(CurrentCapsuleHalfHeight, TargetCapsuleHalfHeight, DeltaTime, CrouchTransitionSpeed);
+    GetCapsuleComponent()->SetCapsuleHalfHeight(NewCapsuleHalfHeight);
+
+    // Interpolate camera position
+    FVector CameraLocation = Camera->GetRelativeLocation();
+    CameraLocation.Z = FMath::FInterpTo(CameraLocation.Z, TargetCameraZ, DeltaTime, CrouchTransitionSpeed);
+    Camera->SetRelativeLocation(CameraLocation);
 }
 
 // Called to bind functionality to input
@@ -120,13 +129,9 @@ void APlayerCharacter::StartCrouch()
     bIsCrouchKeyHeldDown = true;
     GetCharacterMovement()->MaxWalkSpeed = CrouchSpeed;
 
-    // Adjust capsule half-height
-    GetCapsuleComponent()->SetCapsuleHalfHeight(CrouchHeight, true); // Ensure smooth transition
-
-    // Adjust camera height
-    FVector CameraLocation = Camera->GetRelativeLocation();
-    CameraLocation.Z = CrouchCameraZ;
-    Camera->SetRelativeLocation(CameraLocation);
+    // Set target values for smooth transition
+    TargetCapsuleHalfHeight = CrouchHeight;
+    TargetCameraZ = CrouchCameraZ;
 
 }
 
@@ -141,13 +146,9 @@ void APlayerCharacter::StopCrouch()
         bIsCrouching = false;
         GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 
-        // Reset capsule half-height
-        GetCapsuleComponent()->SetCapsuleHalfHeight(DefaultCapsuleHalfHeight, true); // Ensure smooth transition)
-
-        // Reset camera height
-        FVector CameraLocation = Camera->GetRelativeLocation();
-        CameraLocation.Z = DefaultCameraZ;
-        Camera->SetRelativeLocation(CameraLocation);
+        // Set target values for smooth transition
+        TargetCapsuleHalfHeight = DefaultCapsuleHalfHeight;
+        TargetCameraZ = DefaultCameraZ;
 
     }
 }

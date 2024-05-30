@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -28,62 +26,69 @@ public:
     virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 protected:
-	// Player's camera component
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
-	class UCameraComponent* Camera;
+    // Player's camera component
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
+    class UCameraComponent* Camera;
 
-	// Movement speeds
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
-	float WalkSpeed = 600.0f;
+    // Movement speeds
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+    float WalkSpeed = 600.0f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
-	float RunSpeed = 1200.0f;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+    float RunSpeed = 1200.0f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
-	float CrouchSpeed = 300.0f;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+    float CrouchSpeed = 300.0f;
 
-	// Crouch settings
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
-	float CrouchHeight = 40.0f;
+    // Crouch settings
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+    float CrouchHeight = 40.0f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
-	float DefaultCameraZ = 60.0f;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+    float DefaultCameraZ = 60.0f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
-	float CrouchCameraZ = 20.0f;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+    float CrouchCameraZ = 20.0f;
 
-	// Handles moving forward/backward
+    // Handles moving forward/backward
     void MoveForward(float InputValue);
 
-	// Handles moving right/left
+    // Handles moving right/left
     void MoveRight(float InputValue);
 
-	// Handles turning the camera left/right
+    // Handles turning the camera left/right
     void TurnCamera(float InputValue);
 
-	// Handles looking up/down
+    // Handles looking up/down
     void LookUp(float InputValue);
 
-	// Handles crouching
+    // Handles crouching
     void StartCrouch();
     void StopCrouch();
 
-	// Handles running
+    // Handles running
     void StartRun();
     void StopRun();
 
-	// Checks if there's enough space to stand up
-	bool CanStandUp() const;
+    // Checks if there's enough space to stand up
+    bool CanStandUp() const;
 
 private:
-	// Stores the default capsule half-height
+    // Stores the default capsule half-height
     float DefaultCapsuleHalfHeight;
 
-	// Check if player is crouch
-	bool bIsCrouching;
+    // Check if player is crouching
+    bool bIsCrouching;
 
-	// Handles continuous crouch check
-	bool bIsCrouchKeyHeldDown;
+    // Handles continuous crouch check
+    bool bIsCrouchKeyHeldDown;
 
+    // Transition speed for smooth crouching/standing
+    float CrouchTransitionSpeed = 10.0f; // Lower value for slower transition
+
+    // Target values for capsule height and camera Z position
+    float TargetCapsuleHalfHeight;
+    float TargetCameraZ;
 };
+
 
