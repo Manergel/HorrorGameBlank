@@ -2,6 +2,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Engine/World.h"
+#include "HorrorGameBlank/DoorActor.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -15,7 +16,7 @@ APlayerCharacter::APlayerCharacter()
     Camera->bUsePawnControlRotation = true;
 
     // Set default movement speeds
-    GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+    GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;   
 
     // Initialize default values
     DefaultCapsuleHalfHeight = GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight();
@@ -76,6 +77,9 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
     // Bind camera axes
     PlayerInputComponent->BindAxis("TurnCamera", this, &APlayerCharacter::TurnCamera);
     PlayerInputComponent->BindAxis("LookUp", this, &APlayerCharacter::LookUp);
+
+    // Bind the Interact function to the "Interact" input action
+    PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &APlayerCharacter::Interact);
 }
 
 // Handles moving forward/backward
@@ -193,4 +197,31 @@ bool APlayerCharacter::CanStandUp() const
     );
 
     return !bHit;
+}
+
+void APlayerCharacter::Interact()
+{
+    FHitResult HitResult = PerfomInteractionTrace();
+    if (HitResult.GetActor())
+    {
+        ADoorActor* Door = Cast<ADoorActor>(HitResult.GetActor());
+        if (Door)
+        {
+            Door->Interact();
+        }
+    }
+}
+
+FHitResult APlayerCharacter::PerfomInteractionTrace()
+{
+    FVector Start = Camera->GetComponentLocation();
+    FVector End = Start + (Camera->GetForwardVector() * 200.0f);
+
+    FHitResult HitResult;
+    FCollisionQueryParams Params;
+    Params.AddIgnoredActor(this);
+
+    GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, Params);
+
+    return HitResult;
 }

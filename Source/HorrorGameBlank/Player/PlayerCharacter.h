@@ -25,6 +25,9 @@ public:
     // Called to bind functionality to input
     virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+    // Function to handle interaction
+    void Interact();
+
 protected:
     // Player's camera component
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
@@ -89,6 +92,9 @@ private:
     // Target values for capsule height and camera Z position
     float TargetCapsuleHalfHeight;
     float TargetCameraZ;
+
+    // Trace for interactable objects
+    FHitResult PerfomInteractionTrace();
 };
 
 
